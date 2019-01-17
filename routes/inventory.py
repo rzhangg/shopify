@@ -28,4 +28,5 @@ class Inventory(Resource):
         resp.mimetype = 'application/json'
         resp = jsonify('test')
         resp.status_code = 200
+
         return resp

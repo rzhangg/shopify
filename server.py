@@ -6,9 +6,6 @@ from flask import Flask, g
 
 from routes.api import api_v1_bp
 from routes.inventory import inventory
-from db import db
-# from routes.classification import classification
-# from routes.models_management import models_management
 
 PORT = int(os.getenv("PORT", 8000))
 
@@ -41,7 +38,6 @@ def create_app():
     '''
     app.register_blueprint(api_v1_bp)
     app.after_request(add_access_control)
-    db.init_app(app)
     return app
 
 if __name__ == '__main__':

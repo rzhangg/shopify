@@ -6,7 +6,6 @@ CREATE TABLE item(
     title TEXT NOT NULL,
     price INTEGER NOT NULL,
     inventory_count INTEGER NOT NULL,
-    
 );
 
 -- CREATE TABLE cart( 
