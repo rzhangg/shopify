@@ -18,7 +18,7 @@ upload_parser.add_argument('title',type=str, required=True, help='title')
 upload_parser.add_argument('price',type=int, required=True, help='price')
 upload_parser.add_argument('unit',type=int, required=True, help='unit')
 
-@inventory.route('/all')
+@inventory.route('/get')
 @api.doc(responses = {
             200: 'Success',
             404: 'Not Found',
@@ -26,7 +26,7 @@ upload_parser.add_argument('unit',type=int, required=True, help='unit')
             500: 'Internal Server Error'
         })
 
-class Inventory(Resource):
+class GetInventory(Resource):
     """
     Queries database for all Items from SQLite. 
     """
@@ -39,14 +39,44 @@ class Inventory(Resource):
         result = items_schema.dump(all_items)
         if result is None:
             logger.error('No items in database')
-            resp = jsonify('error')
+            resp = resp = jsonify({'message':'error getting items'} )
             resp.status = 400
         else:
             resp = jsonify(result)
+            logger.info(result)
             resp.status_code = 200
         return resp
 
-@inventory.route('')
+@inventory.route('/<string:title>')
+@api.doc(responses = {
+            200: 'Success',
+            404: 'Not Found',
+            400: 'No entries',
+            500: 'Internal Server Error'
+        })
+
+class GetItem(Resource):
+    """
+    Queries database for specific item by title from SQLite db. 
+    """
+    @api.doc(description='get item by title')
+    def get(self, title):
+        logger.debug(f'Getting {title}')
+        resp = Response()
+        resp.mimetype = 'application/json'
+        item = Item.query.get(1) 
+        result = item_schema.dumps(item)
+        if result is None:
+            logger.error(f'No item named {title} found in database')
+            resp = jsonify({'message':'error getting item'} )
+            resp.status = 400
+        else:
+            resp = jsonify(result)
+            logger.info(result)
+            resp.status_code = 200
+        return resp
+
+@inventory.route('/<string:title>&<int:price>&<int:inventory_count>')
 @api.doc(response = {
     200:'Succress',
     400:'Duplicate',
@@ -57,28 +87,23 @@ class CreateItem(Resource):
     For creating new item and adding it to SQLite"
     """
     @api.doc(description='add new item')
-    @api.expect(upload_parser)
-    def post(self):
+    def post(self,title,price,inventory_count):
         logger.debug('Adding new Item')
         resp = Response()
         resp.mimetype= 'application/json'
-        req = request.data
-        
-        # title = request.json['title']
-        # price = request.json['price']
-        # units = request.json['units']
-        print(req)
-        new_item = Item(req)
+        logger.info(f'title: {title} price:{price} inventory_count:{inventory_count}')
+        new_item = Item(title,price,inventory_count)
 
         try:
             logger.info('commiting new Item to db')
+            logger.info(new_item)
             db.session.add(new_item)
             db.session.commit()
-            resp = jsonify(new_item)
+            resp = jsonify(item_schema.dump(new_item))
             resp.status_code = 200
             return resp
         except:
             logger.error('Error commiting Item')
             resp.status_code = 500
-            resp = jsonify(new_item)
+            resp = jsonify({'message':'error commiting item'})
             return resp

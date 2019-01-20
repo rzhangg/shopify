@@ -16,22 +16,22 @@ db = SQLAlchemy(app)
 ma = Marshmallow(app)
 
 class Item(db.Model):
-    id = db.Column(db.Integer, unique=True, primary_key=True)
+    id = db.Column(db.Integer, unique=True, primary_key=True, autoincrement=True)
     title= db.Column(db.String(124), unique=True)
     price= db.Column(db.Integer)
-    units= db.Column(db.Integer)
+    inventory_count= db.Column(db.Integer)
 
-    def __init__(self, title, price, units):
+    def __init__(self, title, price, inventory_count):
         self.title = title
         self.price = price
-        self.units = units
+        self.inventory_count = inventory_count
 
 class ItemSchema(ma.Schema):
     class Meta:
         """
         Expose these fields in json
         """
-        fields= ('title', 'price', 'units')
+        fields= ('title', 'price', 'inventory_count')
 
 from routes.api import api_v1_bp
 from routes.inventory import inventory
