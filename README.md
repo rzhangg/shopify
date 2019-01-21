@@ -34,4 +34,4 @@ Database has been initialized you should see crud.sqlite
 python server.py
 
 To run
-localhost:8000/api/v1/doc
+localhost:8000/gshop/api/v1/doc
