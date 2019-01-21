@@ -6,6 +6,8 @@ https://docs.google.com/document/d/1J49NAOIoWYOumaoQCKopPfudWI_jsQWVKlXmw1f1r-4/
 
 The backend application is responsible for providing RESTful services of a barebone marketplace, which are written using [Python 3](https://www.python.org/) and [Flask](http://flask.pocoo.org/).
 
+App is at https://github.com/rzhangg/shopify
+
 ##Prerequisites: 
 - Python 3.x.x environment
 
