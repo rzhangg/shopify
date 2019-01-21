@@ -49,6 +49,34 @@ In a different terminal
 python server.py
 ```
 
-Swagger UI will be accessible at:
+###APIs
+Access the APIs through Swagger UI at localhost:8000/gshop/api/v1/doc
 
-localhost:8000/gshop/api/v1/doc
+#### /item:
+/item is basic url to access all item related queries
+
+```
+GET /item/{title}
+```
+Takes in title parameter
+Will return item with queried title or return error message if not found
+
+```
+GET /item/all/{inventory_count}
+```
+Takes in inventory count
+Will return all items found with inventory count more than queried value. To get all items pass in 0 as inventory_count
+negative values will return error
+
+```
+POST /item/{title}&{price}&{inv_count}
+```
+Takes in 3 values; title, price, and inventory_count
+creates new item in db with those values. Will return error if item already exists
+
+```
+PUT /item/buy/{title}{inv}
+```
+Purchase endpoint. pass in the title of the item you want to purchase and desired purchase quantity
+Will try to purchase item, if successful will return new inventory_count for item
+If you are trying to purchase more units then available, it will return error

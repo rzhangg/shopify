@@ -6,14 +6,14 @@ from flask import Response, request, jsonify
 from flask_restplus import Resource, reqparse
 from routes.api import api
 
-logger = logging.getLogger('inventory')
-inventory = api.namespace('inventory', description='Inventory')
+logger = logging.getLogger('item')
+item = api.namespace('item', description='Item')
 from server import db,Item, ItemSchema
 
 item_schema = ItemSchema()
 items_schema = ItemSchema(many=True)
 
-@inventory.route('/getall/<int:inventory_count>')
+@item.route('/all/<int:inventory_count>')
 @api.doc(responses = {
             200: 'Success',
             401: 'Negative inventory levels',
@@ -21,7 +21,7 @@ items_schema = ItemSchema(many=True)
             500: 'Internal Server Error'
         })
 
-class GetInventory(Resource):
+class GetAllItem(Resource):
     """
     Queries database for all Items from SQLite. 
     """
@@ -47,7 +47,7 @@ class GetInventory(Resource):
             resp.status_code = 200
         return resp
 
-@inventory.route('/getitem/<string:title>')
+@item.route('/<string:title>')
 @api.doc(responses = {
             200: 'Success',
             404: 'Not Found',
@@ -76,7 +76,7 @@ class GetItem(Resource):
             resp.status_code = 200
         return resp
 
-@inventory.route('/<string:title>&<int:price>&<int:inventory_count>')
+@item.route('/<string:title>&<int:price>&<int:inventory_count>')
 @api.doc(response = {
     200:'Succress',
     400:'Item exists',
@@ -114,5 +114,51 @@ class CreateItem(Resource):
                 logger.error('Error commiting Item')
                 resp.status_code = 500
                 resp = jsonify({'message':'error commiting item'})
+                return resp
+
+@item.route('/buy/<string:title>%<int:inventory_count>')
+@api.doc(response = {
+    200:'Succress',
+    401:'No item found',
+    400:'Item not enough inventory',
+    500:'Internal server error'
+})
+class PurchaseItem(Resource):
+    """
+    Purchasing an item in the database, throw error when item does not have enough inventory"
+    """
+    @api.doc(description='Purchase an item by title. Purchases are only valid if they have enough inventory')
+    def put(self,title,inventory_count):
+        logger.debug('Purchasing new item')
+        resp = Response()
+        resp.mimetype= 'application/json'
+        item = Item.query.filter(Item.title == title).all()
+        #checking if len is 0 meaning that item is not found
+        if len(item) is 0:
+            logger.error('no item found')
+            resp = jsonify({'message': 'no item found'})
+            resp.status_code = 401
+            return resp
+        temp_item = items_schema.dumps(item)
+        logger.info(temp_item)
+        inv_count = item[0].inventory_count
+        if inventory_count > inv_count:
+            logger.error('not enough inventory')
+            resp = jsonify({'message': f'purchase exceeds item:{title} inventory levels'})
+            resp.status_code = 400
+            return resp
+        else:
+            try: 
+                new_inv = inv_count - inventory_count
+                logger.info(f'new inventory level: {new_inv}')
+                item[0].inventory_count = inv_count - inventory_count
+                db.session.commit()
+                resp = jsonify({'message': 'purchase OK!', 'title':f'{title}', 'new inventory':f'{new_inv}'})
+                resp.status_code = 200
+                return resp
+            except:
+                logger.error('Error commiting purchase')
+                resp.status_code = 500
+                resp = jsonify({'message':'error commiting purchase'})
                 return resp
 

@@ -34,7 +34,7 @@ class ItemSchema(ma.Schema):
         fields= ('title', 'price', 'inventory_count')
 
 from routes.api import api_v1_bp
-from routes.inventory import inventory
+from routes.items import item
 
 
 def add_access_control(response):
