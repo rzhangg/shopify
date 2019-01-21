@@ -26,8 +26,8 @@ pip install -r requirements.txt
 
 python
 >>> from server import db
+
 >>> db.create_all()
->>>
 
 Database has been initialized you should see crud.sqlite
 5. In different terminal
