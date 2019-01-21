@@ -1,37 +1,54 @@
-# shopify
-shopify challenge for backend 
+# Shopify Intern application
+This project is for Shopify internship backend application
 
-Requirements: 
+Requirements from: 
 https://docs.google.com/document/d/1J49NAOIoWYOumaoQCKopPfudWI_jsQWVKlXmw1f1r-4/preview
 
-Prerequisites: Python 3.6 environment
+The backend application is responsible for providing RESTful services of a barebone marketplace, which are written using [Python 3](https://www.python.org/) and [Flask](http://flask.pocoo.org/).
 
-Linux:
+##Prerequisites: 
+- Python 3.x.x environment
 
-1. Install virtual environment using
+## To run the project(locally)
 
+Mac OS:
+
+### Install virtual environment
+To avoid the mess of multiple versions, due to multiple local projects, it's recommended to take advantage of Python Virtual Enviromments, or simply [venv](https://docs.python.org/3/tutorial/venv.html).
 in root folder:
-
+```
 python3 -m venv venv 
-
-2. to activate virtual environment
-
 source venv/bin/activate
+```
+Windows:
+```
+py -3 -m venv venv
+venv\Scripts\activate
+```
 
-3. install requirements 
-
+### Install requirements 
+```
+pip install --upgrade pip
 pip install -r requirements.txt
+```
+###initialize database
+SQLite database is being used. A .sqlite file will be generated in the base dir.
 
-4. initialize database
-
+Get into python env
+```
 python
+```
+Within python env, run these commands
+```
 >>> from server import db
-
 >>> db.create_all()
-
-Database has been initialized you should see crud.sqlite
-5. In different terminal
+```
+### Running application
+In a different terminal
+```
 python server.py
+```
 
-To run
+Swagger UI will be accessible at:
+
 localhost:8000/gshop/api/v1/doc
