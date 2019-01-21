@@ -3,7 +3,7 @@ import itertools
 import logging
 
 from flask import Response, request, jsonify
-from flask_restplus import Resource, fields
+from flask_restplus import Resource, reqparse
 from routes.api import api
 
 logger = logging.getLogger('inventory')
@@ -12,11 +12,6 @@ from server import db,Item, ItemSchema
 
 item_schema = ItemSchema()
 items_schema = ItemSchema(many=True)
-
-upload_parser = api.parser()
-upload_parser.add_argument('title',type=str, required=True, help='title')
-upload_parser.add_argument('price',type=int, required=True, help='price')
-upload_parser.add_argument('unit',type=int, required=True, help='unit')
 
 @inventory.route('/get')
 @api.doc(responses = {
@@ -64,8 +59,8 @@ class GetItem(Resource):
         logger.debug(f'Getting {title}')
         resp = Response()
         resp.mimetype = 'application/json'
-        item = Item.query.get(1) 
-        result = item_schema.dumps(item)
+        item = Item.query.filter(Item.title == title).all() 
+        result = items_schema.dumps(item)
         if result is None:
             logger.error(f'No item named {title} found in database')
             resp = jsonify({'message':'error getting item'} )
